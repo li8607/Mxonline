@@ -3,8 +3,9 @@ from django.shortcuts import render
 # Create your views here.
 from django.views.generic.base import View
 
-from users.forms import RegisterForm
-from users.models import UserProfile
+from users.forms import RegisterForm, ActiveForm
+from users.models import UserProfile, EmailVerifyRecord
+from utils.email_send import send_register_eamil
 
 
 class IndexView(View):
@@ -47,6 +48,8 @@ class RegisterView(View):
             user_profile.password = make_password(pass_word)
             user_profile.save()
 
+            send_register_eamil(email, "register")
+
             return render(request, "login.html")
         else:
             return render(request, "register.html", {
@@ -58,3 +61,25 @@ class LoginView(View):
 
     def get(self, request):
         return render(request, 'login.html')
+
+
+class ActiveUserView(View):
+
+    def get(self, request, active_code):
+
+        active_form = ActiveForm(request.GET)
+        all_record = EmailVerifyRecord.objects.filter(code=active_code)
+        if all_record:
+            for record in all_record:
+                email = record.email
+                user = UserProfile.objects.get(email=email)
+                user.is_active = True
+                user.save()
+                return render(request, 'login.html')
+        else:
+            return render(request, "register.html", {
+                "msg":"您的激活链接无效",
+                "active_form": active_form
+            })
+
+

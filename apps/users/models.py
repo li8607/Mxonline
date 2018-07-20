@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
@@ -27,3 +29,16 @@ class UserProfile(AbstractUser):
         return self.username
 
 
+class EmailVerifyRecord(models.Model):
+    SEND_CHOICES = (("register", "注册"), ("forget", "找回密码"), ("update_email", "修改邮箱"))
+    code = models.CharField(max_length=20, verbose_name="验证码")
+    email = models.EmailField(max_length=50, verbose_name="邮箱")
+    send_type = models.CharField(choices=SEND_CHOICES, max_length=20, verbose_name="验证码类型")
+    send_time = models.DateTimeField(default=datetime.now, verbose_name="发送事件")
+
+    class Meta:
+        verbose_name = "邮箱验证码"
+        verbose_name_plural = verbose_name
+
+    def __str__(self):
+        return '{0}({1})'.format(self.code, self.email)
