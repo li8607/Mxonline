@@ -1,9 +1,14 @@
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.backends import ModelBackend
 from django.contrib.auth.hashers import make_password
+from django.db.models import Q
+from django.http import HttpResponseRedirect
 from django.shortcuts import render
+from django.urls import reverse
 # Create your views here.
 from django.views.generic.base import View
 
-from users.forms import RegisterForm, ActiveForm
+from users.forms import RegisterForm, ActiveForm, LoginForm
 from users.models import UserProfile, EmailVerifyRecord
 from utils.email_send import send_register_eamil
 
@@ -57,16 +62,51 @@ class RegisterView(View):
             })
 
 
+class CustomBackend(ModelBackend):
+
+    def authenticate(self, request, username=None, password=None, **kwargs):
+        try:
+            user = UserProfile.objects.get(Q(username=username) | Q(email=username))
+            if user.check_password(password):
+                return user
+        except Exception as e:
+            return None
+
+
 class LoginView(View):
 
     def get(self, request):
         return render(request, 'login.html')
 
+    def post(self, request):
+        login_form = LoginForm(request.POST)
+
+        if login_form.is_valid():
+            user_name = request.POST.get("username", "")
+            pass_word = request.POST.get("password", "")
+
+            user = authenticate(username=user_name, password=pass_word)
+            if user is not None:
+                if user.is_active:
+                    login(request, user)
+                    return HttpResponseRedirect(reverse('index'))
+                else:
+                    return render(request, 'login.html', {
+                        "msg": "用户名未激活! 请前往邮箱进行激活"
+                    })
+            else:
+                return render(request, 'login.html', {
+                    "msg": "用户名或密码错误!"
+                })
+        else:
+            return render(request, 'login.html', {
+                "login_form": login_form
+            })
+
 
 class ActiveUserView(View):
 
     def get(self, request, active_code):
-
         active_form = ActiveForm(request.GET)
         all_record = EmailVerifyRecord.objects.filter(code=active_code)
         if all_record:
@@ -75,11 +115,17 @@ class ActiveUserView(View):
                 user = UserProfile.objects.get(email=email)
                 user.is_active = True
                 user.save()
-                return render(request, 'login.html')
+
+            return render(request, 'login.html')
         else:
             return render(request, "register.html", {
-                "msg":"您的激活链接无效",
+                "msg": "您的激活链接无效",
                 "active_form": active_form
             })
 
 
+class LogoutView(View):
+
+    def get(self, request):
+        logout(request)
+        return HttpResponseRedirect(reverse('index'))

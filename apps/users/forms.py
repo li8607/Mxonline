@@ -10,3 +10,8 @@ class RegisterForm(forms.Form):
 
 class ActiveForm(forms.Form):
     captcha = CaptchaField(error_messages={"invalid": "验证码错误"})
+
+
+class LoginForm(forms.Form):
+    username = forms.CharField(required=True)
+    password = forms.CharField(required=True, min_length=5)
