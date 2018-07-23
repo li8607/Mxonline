@@ -1,14 +1,15 @@
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.backends import ModelBackend
 from django.contrib.auth.hashers import make_password
+from django.core.serializers import json
 from django.db.models import Q
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render
 from django.urls import reverse
 # Create your views here.
 from django.views.generic.base import View
 
-from users.forms import RegisterForm, ActiveForm, LoginForm
+from users.forms import RegisterForm, ActiveForm, LoginForm, UserInfoForm
 from users.models import UserProfile, EmailVerifyRecord
 from utils.email_send import send_register_eamil
 
@@ -17,12 +18,6 @@ class IndexView(View):
 
     def get(self, request):
         return render(request, 'index.html')
-
-
-class UserInfoView(View):
-
-    def get(self, request):
-        return render(request, 'usercenter-info.html')
 
 
 class RegisterView(View):
@@ -129,3 +124,23 @@ class LogoutView(View):
     def get(self, request):
         logout(request)
         return HttpResponseRedirect(reverse('index'))
+
+
+class UserInfoView(View):
+
+    def get(self, request):
+        return render(request, 'usercenter-info.html')
+
+    def post(self, request):
+        user_info_form = UserInfoForm(request.POST, instance=request.user)
+        if user_info_form.is_valid():
+            user_info_form.save()
+            return HttpResponse(
+                '{"status:success"}',
+                content_type='application/json'
+            )
+        else:
+            return HttpResponse(
+                json.dumps(user_info_form.errors),
+                content_type='application/json'
+            )
