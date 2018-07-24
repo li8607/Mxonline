@@ -1,6 +1,7 @@
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.backends import ModelBackend
 from django.contrib.auth.hashers import make_password
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.serializers import json
 from django.db.models import Q
 from django.http import HttpResponseRedirect, HttpResponse
@@ -144,3 +145,33 @@ class UserInfoView(View):
                 json.dumps(user_info_form.errors),
                 content_type='application/json'
             )
+
+
+class UpdateEmailView(LoginRequiredMixin, View):
+
+    def post(self, request):
+        email = request.POST.get('email', "")
+        code = request.POST.get('code', "")
+        existed_records = EmailVerifyRecord.objects.filter(email=email, code=code)
+        if existed_records:
+            user = request.user
+            user.email = email
+            user.save()
+            return HttpResponse(
+                '{"status":"success"}',
+                content_type='application/json')
+        else:
+            return HttpResponse(
+                '{"email":"验证码无效"}',
+                content_type='application/json')
+
+
+class SendEmailCodeView(LoginRequiredMixin, View):
+    def get(self, request):
+        email = request.GET.get('email', '')
+
+        if UserProfile.objects.filter(email=email):
+            return HttpResponse('{"email": "邮箱已经存在"}', content_type='application/json')
+
+        send_register_eamil(email, 'update_email')
+        return HttpResponse('{"status": "success"}', content_type='application/json')
