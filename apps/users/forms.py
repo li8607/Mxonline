@@ -1,7 +1,7 @@
 from captcha.fields import CaptchaField
 from django import forms
 
-from users.models import UserProfile, EmailVerifyRecord
+from users.models import UserProfile
 
 
 class RegisterForm(forms.Form):
@@ -24,3 +24,7 @@ class UserInfoForm(forms.ModelForm):
         model = UserProfile
         fields = ['nick_name', 'gender', 'birthday', 'address', 'mobile']
 
+
+class ModifyPwdForm(forms.Form):
+    password1 = forms.CharField(required=True, min_length=6)
+    password2 = forms.CharField(required=True, min_length=6)

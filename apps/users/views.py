@@ -1,8 +1,9 @@
+import json
+
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.backends import ModelBackend
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.core.serializers import json
 from django.db.models import Q
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render
@@ -10,7 +11,7 @@ from django.urls import reverse
 # Create your views here.
 from django.views.generic.base import View
 
-from users.forms import RegisterForm, ActiveForm, LoginForm, UserInfoForm
+from users.forms import RegisterForm, ActiveForm, LoginForm, UserInfoForm, ModifyPwdForm
 from users.models import UserProfile, EmailVerifyRecord
 from utils.email_send import send_register_eamil
 
@@ -175,3 +176,26 @@ class SendEmailCodeView(LoginRequiredMixin, View):
 
         send_register_eamil(email, 'update_email')
         return HttpResponse('{"status": "success"}', content_type='application/json')
+
+
+class UpdatePwdView(LoginRequiredMixin, View):
+
+    def post(self, request):
+        modify_pwd_form = ModifyPwdForm(request.POST)
+        if modify_pwd_form.is_valid():
+            pwd = request.POST.get('password1', '')
+            pwd2 = request.POST.get('password2', '')
+
+            if pwd != pwd2:
+                return HttpResponse(
+                    '{"status":"fail", "msg":"密码不一致"}',
+                    content_type='application/json')
+            else:
+                user = request.user
+                user.password = make_password(pwd)
+                user.save()
+                return HttpResponse(
+                    '{"status":"success"}',
+                    content_type='application/json')
+        else:
+            return HttpResponse(json.dumps(modify_pwd_form.errors), content_type='application/json')
