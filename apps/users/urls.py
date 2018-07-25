@@ -1,6 +1,6 @@
 from django.urls import path, re_path
 
-from users.views import RegisterView, LoginView, LogoutView, UserInfoView, UpdateEmailView, SendEmailCodeView, UpdatePwdView
+from users.views import RegisterView, LoginView, LogoutView, UserInfoView, UpdateEmailView, SendEmailCodeView, UpdatePwdView, ForgetPwdView, ModifyPwdView
 
 app_name = "users"
 urlpatterns = [
@@ -9,8 +9,10 @@ urlpatterns = [
     path('login/', LoginView.as_view(), name='login'),
     path('logout/', LogoutView.as_view(), name="logout"),
     path('info/', UserInfoView.as_view(), name="user_info"),
-    re_path('update_email/', UpdateEmailView.as_view(), name="update_email"),
-    re_path('sendemail_code/', SendEmailCodeView.as_view(), name="sendemail_code"),
-    re_path('update/pwd/', UpdatePwdView.as_view(), name="update_pwd"),
+    path('update_email/', UpdateEmailView.as_view(), name="update_email"),
+    path('sendemail_code/', SendEmailCodeView.as_view(), name="sendemail_code"),
+    path('update/pwd/', UpdatePwdView.as_view(), name="update_pwd"),
+    path('forget_pwd/', ForgetPwdView.as_view(), name="forget_pwd"),
+    path('modify_pwd/', ModifyPwdView.as_view(), name="modify_pwd"),
 
 ]

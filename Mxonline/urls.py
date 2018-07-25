@@ -16,7 +16,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include, re_path
 
-from users.views import IndexView, ActiveUserView, LogoutView
+from users.views import IndexView, ActiveUserView, ResetPwdView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -24,4 +24,5 @@ urlpatterns = [
     path('users/', include('users.urls', namespace='users')),
     path('captcha/', include('captcha.urls')),
     re_path('active/(?P<active_code>.*)/', ActiveUserView.as_view(), name="user_active"),
+    re_path('reset/(?P<active_code>.*)/', ResetPwdView.as_view(), name="reset_pwd"),
 ]

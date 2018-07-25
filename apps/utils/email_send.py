@@ -34,7 +34,12 @@ def send_register_eamil(email, send_type="register"):
         msg = EmailMessage(email_title, email_body, EMAIL_FROM, [email])
         msg.send()
     elif send_type == 'update_email':
-        email_title = "mtianyan慕课小站 修改邮箱验证码"
+        email_title = "bencheng慕课小站 修改邮箱验证码"
         email_body = "您好,您的账号正在申请修改密码,下面是您的验证码，请注意查收:{}".format(code)
+        msg = EmailMessage(email_title, email_body, EMAIL_FROM, [email])
+        msg.send()
+    elif send_type == 'forget':
+        email_title = "bencheng慕课小站 找回密码链接"
+        email_body = "您好,您的账号正在申请找回密码,请点击下面的链接找回你的账号密码: http://127.0.0.1:8000/reset/{0}".format(code)
         msg = EmailMessage(email_title, email_body, EMAIL_FROM, [email])
         msg.send()
