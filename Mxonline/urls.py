@@ -25,4 +25,5 @@ urlpatterns = [
     path('captcha/', include('captcha.urls')),
     re_path('active/(?P<active_code>.*)/', ActiveUserView.as_view(), name="user_active"),
     re_path('reset/(?P<active_code>.*)/', ResetPwdView.as_view(), name="reset_pwd"),
+    path('org/', include('organization.urls', namespace='org'))
 ]
