@@ -10,7 +10,6 @@ class OrgView(View):
     def get(self, request):
         all_city = CityDict.objects.all()
         all_orgs = CourseOrg.objects.all()
-        org_nums = all_orgs.count()
         city_id = request.GET.get('city', '')
 
         if city_id:
@@ -20,6 +19,7 @@ class OrgView(View):
         if category:
             all_orgs = all_orgs.filter(category=category)
 
+        org_nums = all_orgs.count()
         return render(request, 'org-list.html', {
             "all_orgs": all_orgs,
             "all_city": all_city,
