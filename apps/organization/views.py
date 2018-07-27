@@ -10,7 +10,7 @@ class OrgView(View):
     def get(self, request):
         all_city = CityDict.objects.all()
         all_orgs = CourseOrg.objects.all()
-
+        hot_orgs = all_orgs.order_by("-click_nums")[:3]
         city_id = request.GET.get('city', '')
         if city_id:
             all_orgs = all_orgs.filter(city_id=int(city_id))
@@ -43,4 +43,5 @@ class OrgView(View):
             "city_id": city_id,
             "category": category,
             "sort": sort,
+            "hot_orgs": hot_orgs,
         })
