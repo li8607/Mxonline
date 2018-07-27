@@ -145,7 +145,7 @@
             </div>
             <div class="right companyright">
                 <div class="head">我要学习</div>
-                <form class="rightform" id="jsStayForm">
+                <form class="rightform" id="jsStayForm" >
                     <div>
                         <img src="{% static 'images/rightform1.png' %}"/>
                         <input type="text" name="name" id="companyName" placeholder="名字" maxlength="25"/>
@@ -160,7 +160,7 @@
                     </div>
                     <p class="error company-tips" id="jsCompanyTips"></p>
                     <input class="btn" type="text" id="jsStayBtn" value="立即咨询 >"/>
-                    <input type='hidden' name='csrfmiddlewaretoken' value='5I2SlleZJOMUX9QbwYLUIAOshdrdpRcy'/>
+                    {% csrf_token %}
                 </form>
             </div>
 
@@ -184,7 +184,7 @@
                 $.ajax({
                     cache: false,
                     type: "POST",
-                    url: "/org/add_ask/",
+                    url: "{% url 'org:add_ask' %}",
                     data: $('#jsStayForm').serialize(),
                     async: true,
                     success: function (data) {
