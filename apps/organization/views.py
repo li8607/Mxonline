@@ -64,4 +64,14 @@ class AddUserAskView(View):
 class OrgHomeView(View):
 
     def get(self, request, org_id):
-        return render(request, 'org-detail-homepage.html')
+        course_org = CourseOrg.objects.get(id=int(org_id))
+        course_org.click_nums += 1
+        course_org.save()
+
+        all_courses = course_org.course_set.all()[:4]
+        all_teacher = course_org.teacher_set.all()[:3]
+        return render(request, 'org-detail-homepage.html', {
+            "all_courses": all_courses,
+            "all_teacher": all_teacher,
+            "course_org": course_org
+        })
