@@ -4,7 +4,6 @@ from django.shortcuts import render
 from django.views.generic.base import View
 from pure_pagination import Paginator, PageNotAnInteger
 
-from operation.models import UserAsk
 from organization.forms import UserAskForm
 from .models import CityDict, CourseOrg
 
@@ -54,19 +53,9 @@ class OrgView(View):
 class AddUserAskView(View):
 
     def post(self, request):
-
         userask_form = UserAskForm(request.POST)
         if userask_form.is_valid():
-            name = request.POST.get('name', '')
-            phone = request.POST.get('mobile', '')
-            course_name = request.POST.get('course_name', '')
-
-            ua = UserAsk()
-            ua.name = name
-            ua.mobile = phone
-            ua.course_name = course_name
-            ua.save()
-
+            userask_form.save(commit=True)
             return HttpResponse('{"status":"success"}', content_type='application/json')
         else:
             return HttpResponse('{"status":"fail", "msg":"您的字段有错误,请检查"}', content_type='application/json')
