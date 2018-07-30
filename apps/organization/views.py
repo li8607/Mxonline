@@ -59,3 +59,9 @@ class AddUserAskView(View):
             return HttpResponse('{"status":"success"}', content_type='application/json')
         else:
             return HttpResponse('{"status":"fail", "msg":"您的字段有错误,请检查"}', content_type='application/json')
+
+
+class OrgHomeView(View):
+
+    def get(self, request, org_id):
+        return render(request, 'org-detail-homepage.html')
