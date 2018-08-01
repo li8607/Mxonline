@@ -123,6 +123,8 @@ class TeacherListView(View):
         sort = request.GET.get("sort", "")
         if sort and sort == "hot":
             all_teacher = all_teacher.order_by("-click_nums")
+
+        rank_teacher = all_teacher.order_by("-fav_nums")[:5]
         teacher_nums = all_teacher.count()
 
         try:
@@ -135,5 +137,6 @@ class TeacherListView(View):
         return render(request, 'teachers-list.html', {
             "all_teacher": teachers,
             "teacher_nums": teacher_nums,
-            "sort": sort
+            "sort": sort,
+            "rank_teacher": rank_teacher
         })
