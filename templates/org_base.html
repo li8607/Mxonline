@@ -83,12 +83,12 @@
                 <li {% ifequal current_page 'course' %}
                     class="active2"
                 {% endifequal %}><a href="{% url 'org:org_course' course_org.id %}">机构课程</a></li>
-                <li {% ifequal current_page 'course' %}
-                    class="desc"
-                {% endifequal %}><a href="org-detail-desc.html">机构介绍</a></li>
-                <li {% ifequal current_page 'course' %}
-                    class="teacher"
-                {% endifequal %}><a href="org-detail-teachers.html">机构讲师</a></li>
+                <li {% ifequal current_page 'desc' %}
+                    class="active2"
+                {% endifequal %}><a href="{% url 'org:org_desc' course_org.id %}">机构介绍</a></li>
+                <li {% ifequal current_page 'teacher' %}
+                    class="active2"
+                {% endifequal %}><a href="{% url 'org:org_teacher' course_org.id %}]">机构讲师</a></li>
             </ul>
         </div>
 
