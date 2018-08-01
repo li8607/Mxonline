@@ -140,3 +140,17 @@ class TeacherListView(View):
             "sort": sort,
             "rank_teacher": rank_teacher
         })
+
+
+class OrgTeacherDetailView(View):
+    def get(self, request, teacher_id):
+        teacher = Teacher.objects.get(id=int(teacher_id))
+        teacher.click_nums += 1
+        teacher.save()
+        rank_teacher = Teacher.objects.all().order_by("-fav_nums")[:5]
+        all_course = teacher.course_set.all()
+        return render(request, 'teacher-detail.html', {
+            "teacher": teacher,
+            "rank_teacher": rank_teacher,
+            "all_course": all_course,
+        })
