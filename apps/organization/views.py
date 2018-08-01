@@ -5,7 +5,7 @@ from django.views.generic.base import View
 from pure_pagination import Paginator, PageNotAnInteger
 
 from organization.forms import UserAskForm
-from .models import CityDict, CourseOrg
+from .models import CityDict, CourseOrg, Teacher
 
 
 class OrgView(View):
@@ -113,4 +113,16 @@ class OrgTeacherView(View):
             "course_org": course_org,
             "current_page": current_page,
             "all_teacher": all_teacher
+        })
+
+
+class TeacherListView(View):
+
+    def get(self, request):
+        all_teacher = Teacher.objects.all()
+        teacher_nums = all_teacher.count()
+
+        return render(request, 'teachers-list.html', {
+            "all_teacher": all_teacher,
+            "teacher_nums": teacher_nums
         })
