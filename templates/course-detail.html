@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load staticfiles %}
 {% block title %}
     公开课列表 - 慕学在线网
 {% endblock %}
@@ -7,8 +8,8 @@
         <div class="wp">
             <div class="crumbs">
                 <ul>
-                    <li><a href="index.html">首页</a>></li>
-                    <li><a href="course-list.html">公开课程</a>></li>
+                    <li><a href="{% url 'index' %}">首页</a>></li>
+                    <li><a href="{% url 'courses:list' %}">公开课程</a>></li>
                     <li>课程详情</li>
                 </ul>
             </div>
@@ -22,22 +23,25 @@
                         <div class="picbox">
                             <div class="tb-booth tb-pic">
                                 <img width="440" height="445"
-                                     src="../media/courses/2016/11/540e57300001d6d906000338-240-135_n0L8vbw.jpg"
+                                     src="{{ MEDIA_URL }}{{ course.image }}"
                                      class="jqzoom"/>
                             </div>
 
                         </div>
                         <div class="des">
-                            <h1 title="django 从入门到精通体验开始了">django与vuejs实战项目2</h1>
-                            <span class="key">Python除了简单操作外，还可以做更多事情，本计划中，将带领大家探索Python，让大家掌握如何操作数据库，了解Python WEB网页开发的框架，如何编写爬虫，从大量信息中自动获取所需数据。 Python</span>
+                            <h1 title="{{ course.name }}">{{ course.name }}</h1>
+                            <span class="key">{{ course.desc }}</span>
                             <div class="prize">
-                                <span class="fl">难度：<i class="key">高级</i></span>
-                                <span class="fr">学习人数：12</span>
+                                <span class="fl">难度：<i class="key">{{ course.get_degree_display }}</i></span>
+                                <span class="fr">学习人数：{{ course.students }}</span>
                             </div>
                             <ul class="parameter">
-                                <li><span class="pram word3">时&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;长：</span><span>0</span></li>
+                                <li><span
+                                        class="pram word3">时&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;长：</span><span>{{ course.learn_times }}</span>
+                                </li>
                                 <li><span class="pram word3">章&nbsp;节&nbsp;数：</span><span>5</span></li>
-                                <li><span class="pram word3">课程类别：</span><span title="">web开发/后端开发</span></li>
+                                <li><span class="pram word3">课程类别：</span><span title="">{{ course.category }}</span>
+                                </li>
                                 <li class="piclist"><span class="pram word4">学习用户：</span>
 
                                     <span class="pic"><img width="40" height="40"
@@ -74,12 +78,12 @@
                             <p>世界名校，课程权威</p>
                         </div>
                         <div class="pic">
-                            <a href="/company/14/">
-                                <img width="150" height="80" src="../media/org/2016/11/bjdx.jpg"/>
+                            <a href="{% url 'org:org_home' course.course_org.id %}">
+                                <img width="150" height="80" src="{{ MEDIA_URL }}{{ course.course_org.image }}"/>
                             </a>
                         </div>
-                        <a href="/company/14/">
-                            <h2 class="center" title="清华大学">北京大学</h2>
+                        <a href="{% url 'org:org_home' course.course_org.id %}">
+                            <h2 class="center" title="{{ course.course_org.name }}">{{ course.course_org.name }}</h2>
                         </a>
                         <div class="btn  notlogin
 					     " data-favid="14" id="jsRightBtn">
@@ -88,15 +92,15 @@
                         <div class="clear">
                             <ul>
                                 <li>
-                                    <span>课 &nbsp;程&nbsp; 数：&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;   5</span>
+                                    <span>课 &nbsp;程&nbsp; 数：&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;   {{ course.course_org.course_nums }}</span>
                                 </li>
                                 <li>
-                                    <span>教 &nbsp;师&nbsp; 数：&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  0</span>
+                                    <span>教 &nbsp;师&nbsp; 数：&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  {{ course.course_org.teacher_set.count }}</span>
                                 </li>
-                                <li>所在地区：&nbsp;&nbsp;北京市</li>
+                                <li>所在地区：&nbsp;&nbsp;{{ course.course_org.address }}</li>
                                 <li>认&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;证&nbsp;:
                                     &nbsp;&nbsp;
-                                    <img title="金牌机构" , src="../images/gold.png"/>
+                                    <img title="金牌机构" , src="{% static 'images/gold.png' %}"/>
                                 </li>
                             </ul>
                         </div>
@@ -220,19 +224,22 @@
                 <div class="right layout">
                     <div class="head">相关课程推荐</div>
                     <div class="group_recommend">
-
-                        <dl>
+                        {% for course in course_tag %}
+                                                <dl>
                             <dt>
                                 <a target="_blank" href="">
                                     <img width="240" height="220" class="scrollLoading"
-                                         src="../media/courses/2016/11/540e57300001d6d906000338-240-135_mvvGYHL.jpg"/>
+                                         src="{{ MEDIA_URL }}{{ course.image }}"/>
                                 </a>
                             </dt>
                             <dd>
-                                <a target="_blank" href=""><h2> django实战项目</h2></a>
-                                <span class="fl">学习时长：<i class="key">0</i></span>
+                                <a target="_blank" href=""><h2>{{ course.name }}</h2></a>
+                                <span class="fl">学习时长：<i class="key">{{ course.learn_times }}</i></span>
                             </dd>
                         </dl>
+
+                        {% endfor %}
+
 
 
                     </div>

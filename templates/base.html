@@ -80,7 +80,7 @@
                             <li {% ifequal '/' request.path %}
                                 class="active"
                             {% endifequal %}><a href="{% url 'index' %}">首页</a></li>
-                            <li {% ifequal '/courses/list' request.path|slice:'13' %}
+                            <li {% ifequal '/courses' request.path|slice:'8' %}
                                 class="active"
                             {% endifequal %}>
                                 <a href="{% url 'courses:list' %}">

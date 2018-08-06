@@ -34,4 +34,13 @@ class CourseListView(View):
 class CourseDetailView(View):
 
     def get(self, request, course_id):
-        return render(request, "course-detail.html ")
+        course = Course.objects.get(id=int(course_id))
+        tag = course.tag
+        if tag:
+            course_tag = Course.objects.filter(tag=tag)[1:2]
+        else:
+            course_tag = []
+        return render(request, "course-detail.html ", {
+            "course": course,
+            "course_tag": course_tag
+        })
