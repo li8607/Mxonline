@@ -11,15 +11,26 @@ from django.urls import reverse
 # Create your views here.
 from django.views.generic.base import View
 
+from courses.models import Course
+from organization.models import CourseOrg
 from users.forms import RegisterForm, ActiveForm, LoginForm, UserInfoForm, ModifyPwdForm, ForgetForm
-from users.models import UserProfile, EmailVerifyRecord
+from users.models import UserProfile, EmailVerifyRecord, Banner
 from utils.email_send import send_register_eamil
 
 
 class IndexView(View):
 
     def get(self, request):
-        return render(request, 'index.html')
+        all_banner = Banner.objects.all().order_by('index')[:5]
+        courses = Course.objects.filter(is_banner=False)[:6]
+        banner_courses = Course.objects.filter(is_banner=True)[:3]
+        course_orgs = CourseOrg.objects.all()[:15]
+        return render(request, 'index.html', {
+            "all_banner": all_banner,
+            "courses": courses,
+            "banner_courses": banner_courses,
+            "course_orgs": course_orgs
+        })
 
 
 class RegisterView(View):
