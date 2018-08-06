@@ -1,10 +1,11 @@
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 # Create your views here.
 from django.views.generic.base import View
 from pure_pagination import Paginator, PageNotAnInteger
 
-from courses.models import Course, Video, CourseResource
+from courses.models import Course, Video
 from operation.models import UserCourse
 
 
@@ -48,13 +49,30 @@ class CourseDetailView(View):
         })
 
 
-class CourseInfoView(View):
+class CourseInfoView(LoginRequiredMixin, View):
+    login_url = '/login/'
+    redirect_field_name = 'next'
+
     def get(self, request, course_id):
         course = Course.objects.get(id=int(course_id))
 
+        user_courses = UserCourse.objects.filter(user=request.user, course=course)
+        if not user_courses:
+            user_course = UserCourse(user=request.user, course=course)
+            course.students += 1
+            course.save()
+            user_course.save()
+
+        user_courses = UserCourse.objects.filter(course=course)
+        user_ids = [user_course.user_id for user_course in user_courses]
+        all_user_courses = UserCourse.objects.filter(user__id__in=user_ids)
+        course_ids = [user_course.course_id for user_course in all_user_courses]
+        relate_courses = Course.objects.filter(id__in=course_ids).order_by("-click_nums").exclude(id=course.id)[:4]
+
         return render(request, "course-video.html", {
             "course_id": course_id,
-            "course": course
+            "course": course,
+            "relate_courses": relate_courses
         })
 
 
