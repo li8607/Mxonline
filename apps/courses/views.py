@@ -1,9 +1,11 @@
+from django.http import HttpResponseRedirect
 from django.shortcuts import render
 # Create your views here.
 from django.views.generic.base import View
 from pure_pagination import Paginator, PageNotAnInteger
 
-from courses.models import Course, Video
+from courses.models import Course, Video, CourseResource
+from operation.models import UserCourse
 
 
 class CourseListView(View):
@@ -63,6 +65,6 @@ class CourseCommentView(View):
 
 
 class VideoPlayView(View):
-    def get(self, request, course_id):
-        video = Video.objects.get(id=int(course_id))
-        return render(request, video.url)
+    def get(self, request, video_id):
+        video = Video.objects.get(id=int(video_id))
+        return HttpResponseRedirect(video.url)

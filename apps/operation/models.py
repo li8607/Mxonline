@@ -2,8 +2,9 @@ from datetime import datetime
 
 from django.db import models
 
-
 # Create your models here.
+from courses.models import Course
+from users.models import UserProfile
 
 
 class UserAsk(models.Model):
@@ -18,3 +19,16 @@ class UserAsk(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class UserCourse(models.Model):
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, verbose_name="课程")
+    user = models.ForeignKey(UserProfile, on_delete=models.CASCADE, verbose_name="用户")
+    add_time = models.DateTimeField(default=datetime.now, verbose_name="添加时间")
+
+    class Meta:
+        verbose_name = "用户课程"
+        verbose_name_plural = verbose_name
+
+    def __str__(self):
+        return '用户({0})学习了{1} '.format(self.user, self.course)

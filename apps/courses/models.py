@@ -67,6 +67,21 @@ class Video(models.Model):
         verbose_name_plural = verbose_name
 
     def __str__(self):
-        return '{0}章节的视频 >> {1}'.format(self.lesson,self.name)
+        return '{0}章节的视频 >> {1}'.format(self.lesson, self.name)
 
 
+class CourseResource(models.Model):
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, verbose_name="课程")
+    name = models.CharField(max_length=100, verbose_name="名称")
+    download = models.FileField(
+        upload_to="course/resource/%Y/%m",
+        verbose_name="资源文件",
+        max_length=100)
+    add_time = models.DateTimeField(default=datetime.now, verbose_name="添加时间")
+
+    class Meta:
+        verbose_name = "课程资源"
+        verbose_name_plural = verbose_name
+
+    def __str__(self):
+        return '《{0}》课程的资源: {1}'.format(self.course, self.name)
