@@ -38,6 +38,9 @@ class CourseDetailView(View):
 
     def get(self, request, course_id):
         course = Course.objects.get(id=int(course_id))
+        course.click_nums+=1
+        course.save()
+
         tag = course.tag
         if tag:
             course_tag = Course.objects.filter(tag=tag)[1:2]
