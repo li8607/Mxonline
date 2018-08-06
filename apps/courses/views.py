@@ -3,7 +3,7 @@ from django.shortcuts import render
 from django.views.generic.base import View
 from pure_pagination import Paginator, PageNotAnInteger
 
-from courses.models import Course
+from courses.models import Course, Video
 
 
 class CourseListView(View):
@@ -44,3 +44,25 @@ class CourseDetailView(View):
             "course": course,
             "course_tag": course_tag
         })
+
+
+class CourseInfoView(View):
+    def get(self, request, course_id):
+        course = Course.objects.get(id=int(course_id))
+
+        return render(request, "course-video.html", {
+            "course_id": course_id,
+            "course": course
+        })
+
+
+class CourseCommentView(View):
+    def get(self, request, course_id):
+        course = Course.objects.get(id=int(course_id))
+        return render(request, "course-comment.html")
+
+
+class VideoPlayView(View):
+    def get(self, request, course_id):
+        video = Video.objects.get(id=int(course_id))
+        return render(request, video.url)
