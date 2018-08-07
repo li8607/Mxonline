@@ -32,3 +32,17 @@ class UserCourse(models.Model):
 
     def __str__(self):
         return '用户({0})学习了{1} '.format(self.user, self.course)
+
+
+class CourseComments(models.Model):
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, verbose_name="课程")
+    user = models.ForeignKey(UserProfile, on_delete=models.CASCADE, verbose_name="用户")
+    comments = models.CharField(max_length=250, verbose_name="评论")
+    add_time = models.DateTimeField(default=datetime.now, verbose_name="添加时间")
+
+    class Meta:
+        verbose_name = "评论"
+        verbose_name_plural = verbose_name
+
+    def __str__(self):
+        return '用户({0})对于《{1}》 评论 :'.format(self.user, self.course)

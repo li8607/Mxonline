@@ -1,12 +1,12 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render
 # Create your views here.
 from django.views.generic.base import View
 from pure_pagination import Paginator, PageNotAnInteger
 
 from courses.models import Course, Video
-from operation.models import UserCourse
+from operation.models import UserCourse, CourseComments
 
 
 class CourseListView(View):
@@ -38,7 +38,7 @@ class CourseDetailView(View):
 
     def get(self, request, course_id):
         course = Course.objects.get(id=int(course_id))
-        course.click_nums+=1
+        course.click_nums += 1
         course.save()
 
         tag = course.tag
@@ -82,10 +82,42 @@ class CourseInfoView(LoginRequiredMixin, View):
 class CourseCommentView(View):
     def get(self, request, course_id):
         course = Course.objects.get(id=int(course_id))
-        return render(request, "course-comment.html")
+
+        user_courses = UserCourse.objects.filter(course=course)
+        user_ids = [user_course.user_id for user_course in user_courses]
+        all_user_courses = UserCourse.objects.filter(user__id__in=user_ids)
+        course_ids = [user_course.course_id for user_course in all_user_courses]
+        relate_courses = Course.objects.filter(id__in=course_ids).order_by("-click_nums").exclude(id=course.id)[:4]
+
+        all_comments = CourseComments.objects.filter(course=course).order_by('-add_time')
+
+        return render(request, "course-comment.html", {
+            "course": course,
+            "relate_courses": relate_courses,
+            "all_comments": all_comments
+        })
 
 
 class VideoPlayView(View):
     def get(self, request, video_id):
         video = Video.objects.get(id=int(video_id))
         return HttpResponseRedirect(video.url)
+
+
+class AddComments(View):
+    def post(self, request):
+        if not request.user.is_authenticated:
+            return HttpResponse('{"status":"fail", "msg":"用户未登录"}', content_type='application/json')
+
+        course_id = request.POST.get('course_id', 0)
+        comments = request.POST.get('comments', "")
+        if int(course_id) > 0 and comments:
+            course_comments = CourseComments()
+            course = Course.objects.get(id=int(course_id))
+            course_comments.course = course
+            course_comments.comments = comments
+            course_comments.user = request.user
+            course_comments.save()
+            return HttpResponse('{"status":"success", "msg":"评论成功"}', content_type='application/json')
+        else:
+            return HttpResponse('{"status":"fail", "msg":"评论失败"}', content_type='application/json')
