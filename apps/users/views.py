@@ -12,6 +12,7 @@ from django.urls import reverse
 from django.views.generic.base import View
 
 from courses.models import Course
+from operation.models import UserCourse
 from organization.models import CourseOrg
 from users.forms import RegisterForm, ActiveForm, LoginForm, UserInfoForm, ModifyPwdForm, ForgetForm
 from users.models import UserProfile, EmailVerifyRecord, Banner
@@ -265,3 +266,14 @@ class ModifyPwdView(View):
             })
         else:
             return render(request, 'password_reset.html')
+
+
+class MyCourseView(LoginRequiredMixin, View):
+    login_url = '/login/'
+    redirect_field_name = 'next'
+
+    def get(self, request):
+        user_courses = UserCourse.objects.filter(user=request.user)
+        return render(request, 'usercenter-mycourse.html', {
+            'user_courses': user_courses
+        })
