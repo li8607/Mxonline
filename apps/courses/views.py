@@ -6,7 +6,7 @@ from django.views.generic.base import View
 from pure_pagination import Paginator, PageNotAnInteger
 
 from courses.models import Course, Video
-from operation.models import UserCourse, CourseComments
+from operation.models import UserCourse, CourseComments, UserFavorite
 
 
 class CourseListView(View):
@@ -46,9 +46,20 @@ class CourseDetailView(View):
             course_tag = Course.objects.filter(tag=tag)[1:2]
         else:
             course_tag = []
+
+        has_fav_course = False
+        has_fav_org = False
+        if request.user.is_authenticated:
+            if UserFavorite.objects.filter(user=request.user, fav_id=course.id, fav_type=1):
+                has_fav_course = True
+            if UserFavorite.objects.filter(user=request.user, fav_id=course.course_org.id, fav_type=2):
+                has_fav_org = True
+
         return render(request, "course-detail.html ", {
             "course": course,
-            "course_tag": course_tag
+            "course_tag": course_tag,
+            "has_fav_course": has_fav_course,
+            "has_fav_org": has_fav_org,
         })
 
 
