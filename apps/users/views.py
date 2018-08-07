@@ -12,8 +12,8 @@ from django.urls import reverse
 from django.views.generic.base import View
 
 from courses.models import Course
-from operation.models import UserCourse
-from organization.models import CourseOrg
+from operation.models import UserCourse, UserFavorite
+from organization.models import CourseOrg, Teacher
 from users.forms import RegisterForm, ActiveForm, LoginForm, UserInfoForm, ModifyPwdForm, ForgetForm
 from users.models import UserProfile, EmailVerifyRecord, Banner
 from utils.email_send import send_register_eamil
@@ -277,3 +277,56 @@ class MyCourseView(LoginRequiredMixin, View):
         return render(request, 'usercenter-mycourse.html', {
             'user_courses': user_courses
         })
+
+
+class MyFavOrgView(LoginRequiredMixin, View):
+    login_url = '/login/'
+    redirect_field_name = 'next'
+
+    def get(self, request):
+        org_list = []
+        fav_orgs = UserFavorite.objects.filter(user=request.user, fav_type=2)
+        for fav_org in fav_orgs:
+            org_id = fav_org.fav_id
+            org = CourseOrg.objects.get(id=org_id)
+            org_list.append(org)
+        return render(request, "usercenter-fav-org.html", {
+            "org_list": org_list
+        })
+
+
+class MyFavTeacherView(LoginRequiredMixin, View):
+    login_url = '/login/'
+    redirect_field_name = 'next'
+
+    def get(self, request):
+        teache_list = []
+        fav_orgs = UserFavorite.objects.filter(user=request.user, fav_type=3)
+        for fav_org in fav_orgs:
+            tea_id = fav_org.fav_id
+            tea = Teacher.objects.get(id=tea_id)
+            teache_list.append(tea)
+        return render(request, "usercenter-fav-teacher.html", {
+            "teache_list": teache_list
+        })
+
+
+class MyFavCourseView(LoginRequiredMixin, View):
+    login_url = '/login/'
+    redirect_field_name = 'next'
+
+    def get(self, request):
+        course_list = []
+        fav_orgs = UserFavorite.objects.filter(user=request.user, fav_type=1)
+        for fav_org in fav_orgs:
+            course_id = fav_org.fav_id
+            course = Course.objects.get(id=course_id)
+            course_list.append(course)
+        return render(request, "usercenter-fav-course.html", {
+            "course_list": course_list
+        })
+
+
+class UserMessageView(View):
+    def get(self, request):
+        return render(request, 'usercenter-message.html')

@@ -1,6 +1,8 @@
-from django.urls import path, re_path
+from django.urls import path
 
-from users.views import RegisterView, LoginView, LogoutView, UserInfoView, UpdateEmailView, SendEmailCodeView, UpdatePwdView, ForgetPwdView, ModifyPwdView, MyCourseView
+from users.views import RegisterView, LoginView, LogoutView, UserInfoView, UpdateEmailView, SendEmailCodeView, \
+    UpdatePwdView, ForgetPwdView, ModifyPwdView, MyCourseView, MyFavOrgView \
+    , MyFavTeacherView, MyFavCourseView, UserMessageView
 
 app_name = "users"
 urlpatterns = [
@@ -15,5 +17,9 @@ urlpatterns = [
     path('forget_pwd/', ForgetPwdView.as_view(), name="forget_pwd"),
     path('modify_pwd/', ModifyPwdView.as_view(), name="modify_pwd"),
     path('mycourse/', MyCourseView.as_view(), name="mycourse"),
+    path('myfav/org/', MyFavOrgView.as_view(), name="myfav_org"),
+    path('myfav/teacher/', MyFavTeacherView.as_view(), name="myfav_teacher"),
+    path('myfav/course/', MyFavCourseView.as_view(), name="myfav_course"),
+    path('message/', UserMessageView.as_view(), name="message"),
 
 ]
