@@ -45,7 +45,9 @@
                                 <li class="piclist"><span class="pram word4">学习用户：</span>
                                     {% for user_course in course.usercourse_set.get_queryset|slice:":5" %}
                                         <span class="pic"><img width="40" height="40"
-                                                               src="{{ MEDIA_URL }}{{ user_course.user.image }}"/></span>
+                                                               src="
+
+                                                                       {{ MEDIA_URL }}{{ user_course.user.image }}"/></span>
                                     {% endfor %}
                                 </li>
                             </ul>
@@ -88,7 +90,7 @@
                         </a>
                         <div class="btn  notlogin
 					     " data-favid="14" id="jsRightBtn">
-                            已收藏
+                            {% if has_fav_org %}已收藏{% else %}收藏{% endif %}
                         </div>
                         <div class="clear">
                             <ul>
@@ -165,16 +167,16 @@
             $.ajax({
                 cache: false,
                 type: "POST",
-                url: "/org/add_fav/",
+                url: "{% url 'org:add_fav' %}",
                 data: {'fav_id': fav_id, 'fav_type': fav_type},
                 async: true,
                 beforeSend: function (xhr, settings) {
-                    xhr.setRequestHeader("X-CSRFToken", "5I2SlleZJOMUX9QbwYLUIAOshdrdpRcy");
+                    xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
                 },
                 success: function (data) {
                     if (data.status == 'fail') {
                         if (data.msg == '用户未登录') {
-                            window.location.href = "login.html";
+                            window.location.href = "{% url 'users:login' %}";
                         } else {
                             alert(data.msg)
                         }
@@ -187,11 +189,11 @@
         }
 
         $('#jsLeftBtn').on('click', function () {
-            add_fav($(this), 10, 1);
+            add_fav($(this), {{ course.id }}, 1);
         });
 
         $('#jsRightBtn').on('click', function () {
-            add_fav($(this), 2, 2);
+            add_fav($(this), {{ course.course_org.id }}, 2);
         });
 
 

@@ -4,6 +4,8 @@ from django.shortcuts import render
 from django.views.generic.base import View
 from pure_pagination import Paginator, PageNotAnInteger
 
+from courses.models import Course
+from operation.models import UserFavorite
 from organization.forms import UserAskForm
 from .models import CityDict, CourseOrg, Teacher
 
@@ -71,11 +73,19 @@ class OrgHomeView(View):
 
         all_courses = course_org.course_set.all()[:4]
         all_teacher = course_org.teacher_set.all()[:3]
+
+        has_org_fav = False
+        if request.user.is_authenticated:
+            user_fav = UserFavorite.objects.filter(user=request.user, fav_id=course_org.id, fav_type=2)
+            if user_fav:
+                has_org_fav = True
+
         return render(request, 'org-detail-homepage.html', {
             "all_courses": all_courses,
             "all_teacher": all_teacher,
             "course_org": course_org,
-            "current_page": current_page
+            "current_page": current_page,
+            "has_org_fav": has_org_fav,
         })
 
 
@@ -149,8 +159,76 @@ class OrgTeacherDetailView(View):
         teacher.save()
         rank_teacher = Teacher.objects.all().order_by("-fav_nums")[:5]
         all_course = teacher.course_set.all()
+
+        has_teacher_fav = False
+        has_org_fav = False
+        if request.user.is_authenticated:
+            user_fav = UserFavorite.objects.filter(user=request.user, fav_id=teacher.id, fav_type=3)
+            if user_fav:
+                has_teacher_fav = True
+
+            user_org_fav = UserFavorite.objects.filter(user=request.user, fav_id=teacher.org.id, fav_type=2)
+            if user_org_fav:
+                has_org_fav = True
+
         return render(request, 'teacher-detail.html', {
             "teacher": teacher,
             "rank_teacher": rank_teacher,
             "all_course": all_course,
+            "has_teacher_fav": has_teacher_fav,
+            "has_org_fav": has_org_fav,
         })
+
+
+class AddFavView(View):
+    def post(self, request):
+        id = request.POST.get('fav_id', 0)
+        type = request.POST.get('fav_type', 0)
+
+        if not request.user.is_authenticated:
+            return HttpResponse('{"status":"fail", "msg":"用户未登录"}', content_type='application/json')
+        exist_records = UserFavorite.objects.filter(user=request.user, fav_id=int(id), fav_type=int(type))
+        if exist_records:
+            exist_records.delete()
+            if int(type) == 1:
+                course = Course.objects.get(id=int(id))
+                course.fav_nums -= 1
+                if course.fav_nums < 0:
+                    course.fav_nums = 0
+                course.save()
+            elif int(type) == 2:
+                org = CourseOrg.objects.get(id=int(id))
+                org.fav_nums -= 1
+                if org.fav_nums < 0:
+                    org.fav_nums = 0
+                org.save()
+            else:
+                teacher = Teacher.objects.get(id=int(id))
+                teacher.fav_nums -= 1
+                if teacher.fav_nums < 0:
+                    teacher.fav_nums = 0
+                teacher.save()
+            return HttpResponse('{"status":"success", "msg":"收藏"}', content_type='application/json')
+        else:
+            user_fav = UserFavorite()
+            if int(type) > 0 and int(id) > 0:
+                user_fav.user = request.user
+                user_fav.fav_id = int(id)
+                user_fav.fav_type = int(type)
+                user_fav.save()
+
+                if int(type) == 1:
+                    course = Course.objects.get(id=int(id))
+                    course.fav_nums += 1
+                    course.save()
+                elif int(type) == 2:
+                    org = CourseOrg.objects.get(id=int(id))
+                    org.fav_nums += 1
+                    org.save()
+                else:
+                    teacher = Teacher.objects.get(id=int(id))
+                    teacher.fav_nums += 1
+                    teacher.save()
+                return HttpResponse('{"status":"success", "msg":"已收藏"}', content_type='application/json')
+            else:
+                return HttpResponse('{"status":"fail", "msg":"收藏出错"}', content_type='application/json')
