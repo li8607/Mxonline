@@ -25,9 +25,9 @@ sys.path.insert(0, os.path.join(BASE_DIR, 'extra_apps'))
 SECRET_KEY = 'tbf6vgb*0!yiq1k1jrw%_6=tc@811b60(a8xrhlx=-9_cs)3f*'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost ', 'mxonline.zmrenwu.com']
 
 # Application definition
 AUTHENTICATION_BACKENDS = (
