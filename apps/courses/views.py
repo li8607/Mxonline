@@ -55,7 +55,7 @@ class CourseDetailView(View):
             if UserFavorite.objects.filter(user=request.user, fav_id=course.course_org.id, fav_type=2):
                 has_fav_org = True
 
-        return render(request, "course-detail.html ", {
+        return render(request, "course-detail.html", {
             "course": course,
             "course_tag": course_tag,
             "has_fav_course": has_fav_course,
