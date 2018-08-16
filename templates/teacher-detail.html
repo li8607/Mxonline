@@ -120,7 +120,7 @@
                             <div class="head">讲师排行榜</div>
                             {% for teacher in rank_teacher %}
                                 <dl class="des">
-                                    <span class="num fl">1</span>
+                                    <span class="num fl">{{ forloop.counter }}</span>
                                     <a href="{% url 'org:teacher_detail' teacher.id %}">
                                         <dt>
                                             <img width="50" height="50" class="scrollLoading"
