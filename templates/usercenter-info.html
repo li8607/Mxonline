@@ -28,7 +28,7 @@
                         <label class="changearea" for="avatarUp">
                             <span id="avatardiv" class="pic">
                                 <img width="100" height="100" class="js-img-show" id="avatarShow"
-                                     src="{% static 'media/image/2016/12/default_big_14.png' %}"/>
+                                     src="{{ MEDIA_URL }}{{ request.user.image }}"/>
                             </span>
                             <span class="fl upload-inp-box" style="margin-left:70px;">
                                 <span class="button btn-green btn-w100" id="jsAvatarBtn">修改头像</span>

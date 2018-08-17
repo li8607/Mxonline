@@ -140,7 +140,9 @@ class LogoutView(View):
         return HttpResponseRedirect(reverse('index'))
 
 
-class UserInfoView(View):
+class UserInfoView(LoginRequiredMixin, View):
+    login_url = '/login/'
+    redirect_field_name = 'next'
 
     def get(self, request):
         return render(request, 'usercenter-info.html')
